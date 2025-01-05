@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './config/firebase';
 import Footer from './components/layout/Footer';
+import Home from './pages/Home';
 
 
 
@@ -31,7 +32,7 @@ import Footer from './components/layout/Footer';
     <div className="min-h-screen bg-gray-50">
       <Navbar user={user} />
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/" element={<Home />} />
         </Routes>
         </div>
         <Footer />
