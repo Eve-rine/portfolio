@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import  ProjectForm  from '../components/ProjectForm';
-import  SkillForm  from '../components/SkillForm';
+import ProjectForm from '../components/ProjectForm';
+import SkillForm from '../components/SkillForm';
 
 const Dashboard = () => {
     const [bio, setBio] = useState('');
@@ -13,27 +13,42 @@ const Dashboard = () => {
     const [showSkillForm, setShowSkillForm] = useState(false);
     const [editingProject, setEditingProject] = useState(null);
     const [editingSkill, setEditingSkill] = useState(null);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = async () => {
-        const projectsDoc = await getDocs(collection(db, 'projects'));
-        const skillsDoc = await getDocs(collection(db, 'skills'));
+        try {
+            const projectsDoc = await getDocs(collection(db, 'projects'));
+            const skillsDoc = await getDocs(collection(db, 'skills'));
 
-        const bioQuery = await getDocs(collection(db, 'bio'));
+            const bioQuery = await getDocs(collection(db, 'bio'));
 
-        if (!bioQuery.empty) {
-            const bioDoc = bioQuery.docs[0];
-            setBioId(bioDoc.id);
-            setBio(bioDoc.data().about || '');
+            if (!bioQuery.empty) {
+                const bioDoc = bioQuery.docs[0];
+                setBioId(bioDoc.id);
+                setBio(bioDoc.data().about || '');
+            }
+
+            setProjects(projectsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            setSkills(skillsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setLoading(false);
         }
-
-        setProjects(projectsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-        setSkills(skillsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
-
+    }
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+            </div>
+        );
+    }
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
@@ -50,8 +65,8 @@ const Dashboard = () => {
                     onClick={async () => {
                         const bioRef = doc(db, 'bio', bioId);
                         await updateDoc(bioRef, { content: bio });
-                    
-                        
+
+
                     }}
                     className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
                 >

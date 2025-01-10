@@ -6,25 +6,40 @@ const Home = () => {
   const [bio, setBio] = useState('');
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true); // State for loading spinner
 
   useEffect(() => {
     const fetchData = async () => {
-      const bioDoc = await getDocs(collection(db, 'bio'));
-      const projectsDoc = await getDocs(collection(db, 'projects'));
-      const skillsDoc = await getDocs(collection(db, 'skills'));
+      try {
+        const bioDoc = await getDocs(collection(db, 'bio'));
+        const projectsDoc = await getDocs(collection(db, 'projects'));
+        const skillsDoc = await getDocs(collection(db, 'skills'));
 
-      if (!bioDoc.empty) {
-        console.log('biodata', bioDoc.docs[0]?.data()?.about || 'No bio available');
-        setBio(bioDoc.docs[0]?.data()?.about || '');
-      } else {
-        console.warn('No bio document found');
+        if (!bioDoc.empty) {
+          setBio(bioDoc.docs[0]?.data()?.about || '');
+        } else {
+          console.warn('No bio document found');
+        }
+
+        setProjects(projectsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        setSkills(skillsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Stop loading once data is fetched
       }
-      setProjects(projectsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      setSkills(skillsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     };
 
     fetchData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -52,11 +67,6 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <div key={project.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-              {/* <img 
-                src={project.image || '/api/placeholder/400/200'} 
-                alt={project.title} 
-                className="w-full h-48 object-cover"
-              /> */}
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2">{project.title}</h3>
                 <p className="text-gray-600 mb-4">{project.description}</p>

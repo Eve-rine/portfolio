@@ -22,9 +22,6 @@ const Navbar = ({ user }) => {
               <>
                 {user ? (
                   <>
-                    <Link to="/admin" className="text-gray-700 hover:text-gray-900 px-3 py-2">
-                      Dashboard
-                    </Link>
                     <button
                       onClick={() => signOut(auth)}
                       className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
