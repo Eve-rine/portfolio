@@ -21,13 +21,13 @@ const Navbar = ({ user }) => {
                 </Link>
                 <button
                   onClick={() => signOut(auth)}
-                  className="ml-4 bg-red-500 text-white px-4 py-2 rounded-md"
+                  className="ml-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
                 >
                   Sign Out
                 </button>
               </>
             ) : (
-              <Link to="/dashboard" className="text-gray-700 hover:text-gray-900 px-3 py-2">
+              <Link to="/login" className="text-gray-700 hover:text-gray-900 px-3 py-2">
                 Sign In
               </Link>
             )}

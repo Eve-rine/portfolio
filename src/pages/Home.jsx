@@ -13,7 +13,12 @@ const Home = () => {
       const projectsDoc = await getDocs(collection(db, 'projects'));
       const skillsDoc = await getDocs(collection(db, 'skills'));
 
-      setBio(bioDoc.docs[0]?.data()?.content || '');
+      if (!bioDoc.empty) {
+        console.log('biodata', bioDoc.docs[0]?.data()?.about || 'No bio available');
+        setBio(bioDoc.docs[0]?.data()?.about || '');
+      } else {
+        console.warn('No bio document found');
+      }
       setProjects(projectsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setSkills(skillsDoc.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     };
@@ -34,8 +39,9 @@ const Home = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {skills.map((skill) => (
             <div key={skill.id} className="bg-white p-4 rounded-lg shadow">
-              <h3 className="font-semibold text-lg">{skill.name}</h3>
+              <h3 className="font-semibold">{skill.name}</h3>
               <p className="text-gray-600">{skill.level}</p>
+              <p className="text-gray-500 text-sm">{skill.category}</p>
             </div>
           ))}
         </div>
